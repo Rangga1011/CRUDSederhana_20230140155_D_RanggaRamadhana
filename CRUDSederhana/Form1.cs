@@ -168,4 +168,58 @@ namespace CRUDSederhana
             }
         }
 
+        private void Ubah_Click(object sender, EventArgs e)
+        {
+            if (dgvMahasiswa.SelectedRows.Count > 0)
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    try
+                    {
+                        if (txtNIM.Text == "" || txtNama.Text == "" || txtEmail.Text == "" || txtTelepon.Text == "")
+                        {
+                            MessageBox.Show("Harap isi semua data", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                            return;
+                        }
+
+                        DialogResult confirm = MessageBox.Show("Yakin ingin mengubah data ini?", "Konfirmasi", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                        if (confirm == DialogResult.Yes)
+                        {
+                            conn.Open();
+                            string query = "UPDATE Mahasiswa SET Nama = @Nama, Email = @Email, Telepon = @Telepon, Alamat = @Alamat WHERE NIM = @NIM";
+
+                            using (SqlCommand cmd = new SqlCommand(query, conn))
+                            {
+                                cmd.Parameters.AddWithValue("@NIM", txtNIM.Text.Trim());
+                                cmd.Parameters.AddWithValue("@Nama", txtNama.Text.Trim());
+                                cmd.Parameters.AddWithValue("@Email", txtEmail.Text.Trim());
+                                cmd.Parameters.AddWithValue("@Telepon", txtTelepon.Text.Trim());
+                                cmd.Parameters.AddWithValue("@Alamat", txtAlamat.Text.Trim());
+
+                                int rowsAffected = cmd.ExecuteNonQuery();
+                                if (rowsAffected > 0)
+                                {
+                                    MessageBox.Show("Data berhasil diperbarui", "Sukses", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    LoadData(); // Memuat ulang data setelah pembaruan
+                                    ClearForm(); // Auto Clear setelah ubah data
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Data tidak ditemukan atau gagal diperbarui", "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                }
+                            }
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show("Error: " + ex.Message, "Kesalahan", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            else
+            {
+                MessageBox.Show("Pilih data yang akan diperbarui!", "Peringatan", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            }
+        }
+
         
